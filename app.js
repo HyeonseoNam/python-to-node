@@ -21,8 +21,8 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 
 
@@ -40,20 +40,25 @@ var options = {
 
 
 app.get('/', function(req, res) {
-    
+
     var output;
-    PythonShell.run('black_box.py', options, function (err, results) {
-        if (err) throw err;
-        // results is an array consisting of messages collected during execution
-        // res.writeHead('200', {'Content-Type' : 'text/html;charset=utf8'});
-        // res.write(results);
-        // res.end();
-        output = results;
-        console.log('output - ' + output);
-        console.log('results - ' + results);
-        console.log('results[0] - ' + results[0]);
-        res.write('' + output);
-        res.end();
+    // PythonShell.run('black_box.py', options, function (err, results) {
+    //     if (err) throw err;
+    //     // results is an array consisting of messages collected during execution
+    //     // res.writeHead('200', {'Content-Type' : 'text/html;charset=utf8'});
+    //     // res.write(results);
+    //     // res.end();
+    //     output = results;
+    //     console.log('output - ' + output);
+    //     console.log('results - ' + results);
+    //     console.log('results[0] - ' + results[0]);
+    //     res.write('' + output);
+    //     res.end();
+    // });
+
+    req.app.render('index', function(err, html) {
+       if (err) throw err;
+       res.end(html);
     });
     // console.log('output_outside - ' + output);
 
