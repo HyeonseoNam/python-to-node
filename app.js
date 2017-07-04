@@ -1,46 +1,75 @@
+// express 기본 모듈
 var express = require('express');
+var http = require('http');
 var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
+
+// express 미들웨어
 var bodyParser = require('body-parser');
+var static = require('serve-static');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-
+// express 객체 생성
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// port 설정
+app.set('port', process.env.PORT || 3000);
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
+// body-parser
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(bodyParser.json());
+
+// public static오픈
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+// view engine setup
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'ejs');
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+
+
+// python shell
+var PythonShell = require('python-shell');
+
+var options = {
+    mode: 'text',
+    pythonPath: '',
+    pythonOptions: ['-u'],
+    scriptPath: '',
+    args: ['value1', 'value2', 'value3']
+};
+
+
+
+app.get('/', function(req, res) {
+
+    var output;
+    PythonShell.run('black_box.py', options, function (err, results) {
+        if (err) throw err;
+        // results is an array consisting of messages collected during execution
+        // res.writeHead('200', {'Content-Type' : 'text/html;charset=utf8'});
+        // res.write(results);
+        // res.end();
+        output = results;
+        console.log('output - ' + output);
+        console.log('results - ' + results);
+        console.log('results[0] - ' + results[0]);
+        res.write('' + output);
+        res.end();
+    });
+    // console.log('output_outside - ' + output);
+
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+// PythonShell.run('black_box.py', options, function (err, results) {
+//     if (err) throw err;
+//     // results is an array consisting of messages collected during execution
+//     console.log('results: %j', results);
+// });
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+
+
+
+
+http.createServer(app).listen(app.get('port'), function() {
+   console.log('server running at https://127.0.0.1:' + app.get('port'));
 });
 
-module.exports = app;
