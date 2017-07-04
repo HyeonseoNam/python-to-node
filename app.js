@@ -40,7 +40,7 @@ var options = {
 
 
 app.get('/', function(req, res) {
-
+    
     var output;
     PythonShell.run('black_box.py', options, function (err, results) {
         if (err) throw err;
@@ -58,13 +58,6 @@ app.get('/', function(req, res) {
     // console.log('output_outside - ' + output);
 
 });
-
-// PythonShell.run('black_box.py', options, function (err, results) {
-//     if (err) throw err;
-//     // results is an array consisting of messages collected during execution
-//     console.log('results: %j', results);
-// });
-
 
 
 
