@@ -29,42 +29,43 @@ app.set('view engine', 'ejs');
 // python shell
 var PythonShell = require('python-shell');
 
-var options = {
-    mode: 'text',
-    pythonPath: '',
-    pythonOptions: ['-u'],
-    scriptPath: '',
-    args: ['value1', 'value2', 'value3']
-};
+
 
 
 
 app.get('/', function(req, res) {
-
-    var output;
-    // PythonShell.run('black_box.py', options, function (err, results) {
-    //     if (err) throw err;
-    //     // results is an array consisting of messages collected during execution
-    //     // res.writeHead('200', {'Content-Type' : 'text/html;charset=utf8'});
-    //     // res.write(results);
-    //     // res.end();
-    //     output = results;
-    //     console.log('output - ' + output);
-    //     console.log('results - ' + results);
-    //     console.log('results[0] - ' + results[0]);
-    //     res.write('' + output);
-    //     res.end();
-    // });
-
     req.app.render('index', function(err, html) {
        if (err) throw err;
        res.end(html);
     });
-    // console.log('output_outside - ' + output);
-
 });
 
+// post action되었을때 미들웨어 parameter 확인 후 python 실행
+app.use('/submit_data', function(req,res) {
 
+    // POST 로 넘어온 값 확인
+    var inputData = req.body.input_data;
+
+    // options에 등록후
+    var options = {
+        mode: 'text',
+        pythonOptions: ['-u'],
+        args: [inputData]
+    };
+
+    // python code를 호출할때 parameter로 넘겨준다.
+    PythonShell.run('black_box.py', options, function (err, result) {
+        if (err) throw err;
+
+        // 넘긴 후, 가공된 result를 context로 ejs view에 넘겨준다.
+        var context = { result : result};
+        // res.write('' + output);
+        req.app.render('result_page', context, function(err, html) {
+           if (err) throw err;
+           res.end(html);
+        });
+    });
+});
 
 
 http.createServer(app).listen(app.get('port'), function() {
